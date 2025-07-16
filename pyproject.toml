@@ -1,0 +1,101 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "demoviz"
+description = "Demographic data visualization with human icons for matplotlib"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Matthias Flotho", email = "matthias.flotho@ccb.uni-saarland.de"},
+]
+keywords = ["matplotlib", "visualization", "demographics", "scatter", "icons", "human"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry", 
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9", 
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+dependencies = [
+    "matplotlib>=3.5.0",
+    "numpy>=1.20.0",
+    "Pillow>=8.0.0",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+svg = ["cairosvg>=2.5.0"]
+seaborn = ["seaborn>=0.11.0"]
+pandas = ["pandas>=1.3.0"]
+all = [
+    "cairosvg>=2.5.0",
+    "seaborn>=0.11.0", 
+    "pandas>=1.3.0"
+]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov",
+    "black", 
+    "flake8",
+    "build",
+    "twine",
+    "jupyter",
+    "matplotlib>=3.5.0",
+    "cairosvg>=2.5.0",
+    "seaborn>=0.11.0",
+    "pandas>=1.3.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/maflot/demoviz"
+Repository = "https://github.com/maflot/demoviz.git"
+Issues = "https://github.com/maflot/demoviz/issues"
+Documentation = "https://demoviz.readthedocs.io"
+
+[tool.setuptools]
+packages = ["demoviz"]
+
+[tool.setuptools.package-data]
+demoviz = ["icons/*.svg", "icons/*.png"]
+
+[tool.setuptools_scm]
+write_to = "demoviz/_version.py"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+addopts = "--cov=demoviz --cov-report=html --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["demoviz"]
+omit = ["*/tests/*", "setup.py"]    
