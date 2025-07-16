@@ -204,7 +204,7 @@ def create_disease_burden_plot(df):
     ax.set_ylim(0, 4.5)
     
     plt.tight_layout()
-    plt.savefig('data/german_disease_burden_2023.png', dpi=300, bbox_inches='tight')
+    plt.savefig('plots/german_disease_burden_2023.png', dpi=300, bbox_inches='tight')
     return fig
 
 def create_sex_comparison_plot(df):
@@ -258,7 +258,7 @@ def create_sex_comparison_plot(df):
     plt.suptitle('Disease-Specific Mortality Patterns by Sex and Age', 
                 fontsize=16, fontweight='bold')
     plt.tight_layout()
-    plt.savefig('data/german_disease_sex_comparison_2023.png', dpi=300, bbox_inches='tight')
+    plt.savefig('plots/german_disease_sex_comparison_2023.png', dpi=300, bbox_inches='tight')
     return fig
 
 def create_cancer_vs_infectious_plot(df):
@@ -309,7 +309,7 @@ def create_cancer_vs_infectious_plot(df):
     plt.suptitle('Infectious vs Cancer Mortality Patterns in Germany 2023', 
                 fontsize=16, fontweight='bold')
     plt.tight_layout()
-    plt.savefig('data/german_infectious_vs_cancer_2023.png', dpi=300, bbox_inches='tight')
+    plt.savefig('plots/german_infectious_vs_cancer_2023.png', dpi=300, bbox_inches='tight')
     return fig
 
 def create_age_mortality_heatmap(df):
@@ -382,7 +382,7 @@ def create_age_mortality_heatmap(df):
     ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('data/german_mortality_heatmap_2023.png', dpi=300, bbox_inches='tight')
+    plt.savefig('plots/german_mortality_heatmap_2023.png', dpi=300, bbox_inches='tight')
     return fig
 
 def main():
