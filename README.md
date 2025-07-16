@@ -27,7 +27,7 @@ python demographic_change.py
 python disease_analysis.py
 ```
 The data displayed is from 2023 and beatifully visualized the fall of the berlin wall and the reunification of germany.
-![demographic_change](example/plots/german_infectious_vs_cancer_2023.png)
+![demographic_change](example/plots/germany_demographic_timeline.png)
 
 But also the disease burden and the sex-specific disease burden are visualized.
 ![disease_analysis](example/plots/german_infectious_vs_cancer_2023.png)
