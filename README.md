@@ -3,6 +3,11 @@
 > **note**
 > Fell free to fork or use it as a template for your own project with other icons.
 
+## Installation
+``` bash
+pip install demoviz
+```
+
 ## Demoviz
 
 Demoviz is a library for creating demographic visualizations.
