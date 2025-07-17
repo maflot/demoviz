@@ -2,7 +2,7 @@
 
 ## Data
 
-The data is from the [German Federal Statistical Office]
+The data is from the [German Federal Statistical Office] right now dummy data is used.
 [12411-0001_en](https://www-genesis.destatis.de/datenbank/online/statistic/12411/table/12411-0001).
 [23211-0002_en](https://www-genesis.destatis.de/datenbank/online/table/23211-0002)
 ## Visualization
