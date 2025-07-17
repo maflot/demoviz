@@ -25,7 +25,6 @@ wget https://upload.wikimedia.org/wikipedia/commons/d/d8/Person_icon_BLACK-01.sv
 
 ## Example
 See readme in example directory for more details, but her in short:
-Open access by the german federal statistical office is used some age-based data visualization.
 ``` bash
 cd example  
 python demographic_change.py
