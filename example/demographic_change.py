@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from pathlib import Path
 import demoviz as dv
+from demoviz import DemoScatter
 import scipy
 # Set style for publication-quality plots
 np.random.seed(42)
@@ -181,7 +182,8 @@ def create_reunification_impact_plot(df):
             color = '#FF0000' if year == 1990 else '#FFD700'  # Red for reunification, gold for others
             
             # Use demoviz for symbolic representation
-            dv.scatter([x_pos], [y_pos], sex=['M'], c=[color], s=60, zoom=0.4, ax=ax1)
+            demo_scatter = DemoScatter(icon_size=60, zoom=0.4)
+            demo_scatter.plot(ax1, [x_pos], [y_pos], icon_type=['male'], colors=[color])
     
     ax1.axvline(x=1990, color='red', linestyle='--', alpha=0.7, linewidth=2)
     ax1.text(1990.2, 75, 'German\nReunification\nOct 3, 1990', 
@@ -205,8 +207,9 @@ def create_reunification_impact_plot(df):
     max_growth_year = reunification_data.loc[reunification_data['growth_rate'].idxmax(), 'year']
     max_growth_rate = reunification_data['growth_rate'].max()
     
-    dv.scatter([max_growth_year], [max_growth_rate + 5], 
-               sex=['M'], c=['#00FF00'], s=80, zoom=0.5, ax=ax2)
+    demo_scatter = DemoScatter(icon_size=80, zoom=0.5)
+    demo_scatter.plot(ax2, [max_growth_year], [max_growth_rate + 5], 
+                      icon_type=['male'], colors=['#00FF00'])
     ax2.text(max_growth_year, max_growth_rate + 8, f'+{max_growth_rate:.1f}%\nPeak Growth', 
              ha='center', fontsize=9, fontweight='bold')
     
@@ -253,11 +256,14 @@ def create_demographic_phases_plot(df):
         'Immigration Wave': '#9370DB'       # Medium Purple
     }
     
-    colors = [phase_colors[phase] for phase in plot_data['phase']]
+    # Convert hex colors to RGB tuples
+    from matplotlib.colors import to_rgba
+    colors = [to_rgba(phase_colors[phase]) for phase in plot_data['phase']]
     
     # Use demoviz for the main visualization
-    dv.scatter(x_pos, y_pos, sex=plot_data['demo_sex'], c=colors, 
-               s=60, zoom=0.8, jitter=0.5, ax=ax)
+    demo_scatter = DemoScatter(icon_size=60, zoom=0.8)
+    demo_scatter.plot(ax, x_pos, y_pos, icon_type=plot_data['demo_sex'], 
+                      colors=colors, jitter=0.5)
     
     # Add smooth trend line using spline interpolation
     from scipy.interpolate import PchipInterpolator
@@ -340,18 +346,19 @@ def create_population_pyramid_evolution(df):
         y_positions = np.arange(len(age_groups))
         
         # Male side (left)
+        demo_scatter = DemoScatter(icon_size=40, zoom=0.3)
         for i, (age_group, male_p) in enumerate(zip(age_groups, male_pct)):
             n_icons = max(1, int(male_p / 3))  # Scale down for visualization
             x_positions = np.linspace(-male_p, -1, n_icons)
-            dv.scatter(x_positions, [i] * n_icons, sex=['M'] * n_icons,
-                      c=['#4A90E2'] * n_icons, s=40, zoom=0.3, ax=ax)
+            demo_scatter.plot(ax, x_positions, [i] * n_icons, icon_type=['male'] * n_icons,
+                             colors=['#4A90E2'] * n_icons)
         
         # Female side (right)
         for i, (age_group, female_p) in enumerate(zip(age_groups, female_pct)):
             n_icons = max(1, int(female_p / 3))
             x_positions = np.linspace(1, female_p, n_icons)
-            dv.scatter(x_positions, [i] * n_icons, sex=['F'] * n_icons,
-                      c=['#E94B3C'] * n_icons, s=40, zoom=0.3, ax=ax)
+            demo_scatter.plot(ax, x_positions, [i] * n_icons, icon_type=['female'] * n_icons,
+                             colors=['#E94B3C'] * n_icons)
         
         # Customize each subplot
         ax.set_yticks(y_positions)
