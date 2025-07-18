@@ -94,6 +94,9 @@ class DemoScatter:
         'male': 'male', 'female': 'female',
         'man': 'male', 'woman': 'female',
         1: 'male', 0: 'female',  # Common numeric coding
+        # Age/Life stage
+        'baby': 'baby', 'child': 'baby', 'infant': 'baby',
+        'B': 'baby', 'C': 'baby', 'I': 'baby',
         # Add more aliases as needed
     }
     
@@ -122,6 +125,7 @@ class DemoScatter:
             # Look for your specific icon files
             person_file = icon_dir / 'Person_icon_BLACK-01.svg'
             woman_file = icon_dir / 'Woman_(958542)_-_The_Noun_Project.svg'
+            baby_file = icon_dir / 'Baby_icon.svg'
             
             if person_file.exists():
                 paths['male'] = person_file
@@ -129,6 +133,10 @@ class DemoScatter:
             if woman_file.exists():
                 paths['female'] = woman_file
                 paths['woman'] = woman_file
+            if baby_file.exists():
+                paths['baby'] = baby_file
+                paths['child'] = baby_file
+                paths['infant'] = baby_file
                 
             return paths
             
@@ -203,12 +211,12 @@ class DemoScatter:
         except (ValueError, TypeError):
             color = (0.2, 0.2, 0.8, 0.8)  # Default fallback
         
-        # Create cache key
+        # Create cache key (include icon_size for proper caching)
         try:
-            cache_key = f"{icon_type}_{hash(color)}"
+            cache_key = f"{icon_type}_{self.icon_size}_{hash(color)}"
         except (TypeError, ValueError):
             # Fallback for unhashable types
-            cache_key = f"{icon_type}_{id(color)}"
+            cache_key = f"{icon_type}_{self.icon_size}_{id(color)}"
         
         if cache_key in self.icon_cache:
             return self.icon_cache[cache_key]
@@ -316,6 +324,12 @@ class DemoScatter:
             imagebox = OffsetImage(img, zoom=self.zoom)
             ab = AnnotationBbox(imagebox, (x_jitter[i], y_jitter[i]), frameon=False, pad=0)
             ax.add_artist(ab)
+        
+        # Update axis limits to include all data points
+        # AnnotationBbox doesn't automatically update axis limits
+        if len(x_jitter) > 0 and len(y_jitter) > 0:
+            ax.update_datalim(np.column_stack([x_jitter, y_jitter]))
+            ax.autoscale_view()
         
         return ax
     

@@ -18,71 +18,107 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from pathlib import Path
 import demoviz as dv
-
+import scipy
 # Set style for publication-quality plots
 np.random.seed(42)
 
 def load_germany_data():
     """Load and clean German population data."""
-    try:
-        # Try to load from data directory
-        data_path = Path("data/germany_population.csv")
-        if not data_path.exists():
-            # Create the data from the provided information
-            create_germany_dataset()
+    # Try to load from data directory
+    data_path = Path("example/data/12411-0001_en.csv")
+    
+    # Read the CSV file manually to handle the header structure
+    with open(data_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    
+    # Find the data start (skip header lines)
+    data_start_idx = None
+    for i, line in enumerate(lines):
+        if line.strip() and not line.startswith('Tabelle:') and not line.startswith('Population:') and not line.startswith('Current') and not line.startswith('Germany;') and not line.startswith(';Population') and not line.startswith(';number'):
+            # Check if this looks like a data line (contains date and number)
+            if ';' in line and line.split(';')[0].strip() and line.split(';')[1].strip():
+                data_start_idx = i
+                break
+    
+    if data_start_idx is None:
+        raise ValueError("Could not find data start in CSV file")
+    
+    # Parse data rows
+    data_rows = []
+    for i in range(data_start_idx, len(lines)):
+        line = lines[i].strip()
+        if not line or line.startswith('__________') or line.startswith('©'):
+            continue
+            
+        parts = line.split(';')
+        if len(parts) >= 2:
+            date_str = parts[0].strip()
+            population_str = parts[1].strip()
+            
+            try:
+                date = pd.to_datetime(date_str)
+                population = int(population_str)
+                data_rows.append({
+                    'date': date,
+                    'population': population,
+                    'year': date.year
+                })
+            except (ValueError, TypeError):
+                continue
+    
+    df = pd.DataFrame(data_rows)
+    
+    print(f"Loaded {len(df)} data points from {df['year'].min()} to {df['year'].max()}")
+    print(f"Population range: {df['population'].min():,} to {df['population'].max():,}")
+    print(f"Sample data points:")
+    print(df.head())
+    
+    # Add demographic phases with smooth transitions
+    def assign_phase_smooth(year):
+        """Assign demographic phase with smooth transitions around key dates."""
+        # Key transition years
+        transitions = {
+            1961: ('Post-War Growth', 'Baby Boom Era'),
+            1973: ('Baby Boom Era', 'Stagnation'),
+            1990: ('Stagnation', 'Reunification Boom'),
+            2005: ('Reunification Boom', 'Decline Period'),
+            2015: ('Decline Period', 'Immigration Wave')
+        }
         
-        df = pd.read_csv(data_path)
-        df['date'] = pd.to_datetime(df['date'])
-        df['year'] = df['date'].dt.year
-        return df
-    except Exception as e:
-        print(f"Error loading data: {e}")
-        return create_germany_dataset()
-
-def create_germany_dataset():
-    """Create the German population dataset from the provided data."""
-    # Population data from Statistisches Bundesamt
-    population_data = [
-        ("1950-12-31", 50958125), ("1951-12-31", 51434777), ("1952-12-31", 51863761),
-        ("1953-12-31", 52453806), ("1954-12-31", 52943295), ("1955-12-31", 53517683),
-        ("1956-12-31", 53339626), ("1957-12-31", 54064365), ("1958-12-31", 54719159),
-        ("1959-12-31", 55257088), ("1960-12-31", 55958321), ("1961-12-31", 56589148),
-        ("1962-12-31", 57247246), ("1963-12-31", 57864509), ("1964-12-31", 58587451),
-        ("1965-12-31", 59296591), ("1966-12-31", 59792934), ("1967-12-31", 59948474),
-        ("1968-12-31", 60463033), ("1969-12-31", 61194591), ("1970-12-31", 61001164),
-        ("1971-12-31", 61502503), ("1972-12-31", 61809378), ("1973-12-31", 62101369),
-        ("1974-12-31", 61991475), ("1975-12-31", 61644624), ("1976-12-31", 61441996),
-        ("1977-12-31", 61352745), ("1978-12-31", 61321663), ("1979-12-31", 61439342),
-        ("1980-12-31", 61657945), ("1981-12-31", 61712689), ("1982-12-31", 61546101),
-        ("1983-12-31", 61306669), ("1984-12-31", 61049256), ("1985-12-31", 61020474),
-        ("1986-12-31", 61140461), ("1987-12-31", 61238079), ("1988-12-31", 61715103),
-        ("1989-12-31", 62679035), ("1990-12-31", 79753227), ("1991-12-31", 80274564),
-        ("1992-12-31", 80974632), ("1993-12-31", 81338093), ("1994-12-31", 81538603),
-        ("1995-12-31", 81817499), ("1996-12-31", 82012162), ("1997-12-31", 82057379),
-        ("1998-12-31", 82037011), ("1999-12-31", 82163475), ("2000-12-31", 82259540),
-        ("2001-12-31", 82440309), ("2002-12-31", 82536680), ("2003-12-31", 82531671),
-        ("2004-12-31", 82500849), ("2005-12-31", 82437995), ("2006-12-31", 82314906),
-        ("2007-12-31", 82217837), ("2008-12-31", 82002356), ("2009-12-31", 81802257),
-        ("2010-12-31", 81751602), ("2011-12-31", 80327900), ("2012-12-31", 80523746),
-        ("2013-12-31", 80767463), ("2014-12-31", 81197537), ("2015-12-31", 82175684),
-        ("2016-12-31", 82521653), ("2017-12-31", 82792351), ("2018-12-31", 83019213),
-        ("2019-12-31", 83166711), ("2020-12-31", 83155031), ("2021-12-31", 83237124),
-        ("2022-12-31", 83118501), ("2023-12-31", 83456045), ("2024-12-31", 83577140)
-    ]
+        # Find the closest transition year
+        closest_year = min(transitions.keys(), key=lambda x: abs(x - year))
+        phase_before, phase_after = transitions[closest_year]
+        
+        # Create smooth transition within ±3 years of transition points
+        transition_window = 3
+        if abs(year - closest_year) <= transition_window:
+            # Smooth interpolation between phases
+            transition_progress = (year - (closest_year - transition_window)) / (2 * transition_window)
+            transition_progress = max(0, min(1, transition_progress))  # Clamp to [0,1]
+            
+            # Use cubic smoothing for more natural transitions
+            smooth_factor = 3 * transition_progress**2 - 2 * transition_progress**3
+            
+            if smooth_factor < 0.5:
+                return phase_before
+            else:
+                return phase_after
+        else:
+            # Outside transition window, use the phase for that period
+            if year < 1961:
+                return 'Post-War Growth'
+            elif year < 1973:
+                return 'Baby Boom Era'
+            elif year < 1990:
+                return 'Stagnation'
+            elif year < 2005:
+                return 'Reunification Boom'
+            elif year < 2015:
+                return 'Decline Period'
+            else:
+                return 'Immigration Wave'
     
-    df = pd.DataFrame(population_data, columns=['date', 'population'])
-    df['date'] = pd.to_datetime(df['date'])
-    df['year'] = df['date'].dt.year
-    
-    # Add demographic phases
-    df['phase'] = df['year'].apply(lambda x: 
-        'Post-War Growth' if x < 1961 else
-        'Baby Boom Era' if x < 1973 else
-        'Stagnation' if x < 1990 else
-        'Reunification Boom' if x < 2005 else
-        'Decline Period' if x < 2015 else
-        'Immigration Wave'
-    )
+    df['phase'] = df['year'].apply(assign_phase_smooth)
     
     # Add population change
     df['pop_change'] = df['population'].diff()
@@ -94,10 +130,6 @@ def create_germany_dataset():
     df.loc[df['year'] == 1989, 'milestone'] = 'Fall of Berlin Wall'
     df.loc[df['year'] == 1990, 'milestone'] = 'German Reunification'
     df.loc[df['year'] == 2015, 'milestone'] = 'Refugee Crisis'
-    
-    # Save to CSV for future use
-    Path("data").mkdir(exist_ok=True)
-    df.to_csv("data/germany_population.csv", index=False)
     
     return df
 
@@ -126,9 +158,18 @@ def create_reunification_impact_plot(df):
     years = reunification_data['year']
     pop_millions = reunification_data['symbolic_pop']
     
-    # Use traditional scatter for the line, then human icons for key points
-    ax1.plot(years, pop_millions, 'o-', linewidth=3, markersize=8, 
-             color='#000000', alpha=0.3, label='Population Trend')
+    # Use smooth spline interpolation for the trend line
+    from scipy.interpolate import PchipInterpolator
+    
+    # Create smooth curve through the data points
+    x_smooth = np.linspace(years.min(), years.max(), 100)
+    pchip = PchipInterpolator(years, pop_millions)
+    y_smooth = pchip(x_smooth)
+    
+    ax1.plot(x_smooth, y_smooth, '-', linewidth=4, 
+             color='#000000', alpha=0.4, label='Population Trend (Smooth)')
+    ax1.plot(years, pop_millions, 'o', markersize=6, 
+             color='#000000', alpha=0.6, label='Actual Data Points')
     
     # Highlight reunification with human icons
     key_years = [1989, 1990, 1991]
@@ -175,7 +216,7 @@ def create_reunification_impact_plot(df):
     ax2.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('plots/germany_reunification_impact.png', dpi=300, bbox_inches='tight')
+    plt.savefig('example/plots/germany_reunification_impact.png', dpi=300, bbox_inches='tight')
     return fig
 
 def create_demographic_phases_plot(df):
@@ -218,8 +259,15 @@ def create_demographic_phases_plot(df):
     dv.scatter(x_pos, y_pos, sex=plot_data['demo_sex'], c=colors, 
                s=60, zoom=0.8, jitter=0.5, ax=ax)
     
-    # Add trend line
-    ax.plot(x_pos, y_pos, '--', color='gray', alpha=0.5, linewidth=2, zorder=0)
+    # Add smooth trend line using spline interpolation
+    from scipy.interpolate import PchipInterpolator
+    
+    # Create smooth curve through the data points
+    x_smooth = np.linspace(x_pos.min(), x_pos.max(), 200)
+    pchip = PchipInterpolator(x_pos, y_pos)
+    y_smooth = pchip(x_smooth)
+    
+    ax.plot(x_smooth, y_smooth, '--', color='gray', alpha=0.6, linewidth=3, zorder=0, label='Smooth Trend')
     
     # Highlight major events
     events = [
@@ -255,19 +303,8 @@ def create_demographic_phases_plot(df):
     ax.set_ylim(45, 90)
     ax.grid(True, alpha=0.3)
     
-    # Add annotations for key insights
-    ax.text(0.02, 0.98, 
-           'Key Insights:\n'
-           '• 1990: +27% population jump from reunification\n'
-           '• 2005-2015: Demographic decline period\n'
-           '• 2015+: Immigration-driven recovery\n'
-           '• 75 years: +32.6 million people (+64%)',
-           transform=ax.transAxes, fontsize=11,
-           verticalalignment='top',
-           bbox=dict(boxstyle="round,pad=0.5", facecolor='lightblue', alpha=0.8))
-    
     plt.tight_layout()
-    plt.savefig('plots/germany_demographic_phases.png', dpi=300, bbox_inches='tight')
+    plt.savefig('example/plots/germany_demographic_phases.png', dpi=300, bbox_inches='tight')
     return fig
 
 def create_population_pyramid_evolution(df):
@@ -332,86 +369,9 @@ def create_population_pyramid_evolution(df):
     plt.suptitle('Evolution of Germany\'s Age Structure: From Baby Boom to Aging Society', 
                 fontsize=16, fontweight='bold')
     plt.tight_layout()
-    plt.savefig('plots/germany_population_pyramid_evolution.png', dpi=300, bbox_inches='tight')
+    plt.savefig('example/plots/germany_population_pyramid_evolution.png', dpi=300, bbox_inches='tight')
     return fig
 
-def create_interactive_timeline(df):
-    """Create an interactive-style timeline of German demographic milestones."""
-    print("Creating demographic timeline...")
-    
-    # Select milestone years
-    milestones = [
-        (1955, "Post-war economic miracle begins", "Economic Growth"),
-        (1961, "Berlin Wall built", "Division"),
-        (1973, "Oil crisis & demographic transition", "Crisis"),
-        (1989, "Fall of Berlin Wall", "Liberation"),
-        (1990, "German Reunification", "Unity"),
-        (2005, "Population peak reached", "Peak"),
-        (2015, "Refugee crisis & immigration wave", "Immigration"),
-        (2024, "Modern Germany", "Present")
-    ]
-    
-    fig, ax = plt.subplots(figsize=(18, 10))
-    
-    # Create timeline base
-    years = [m[0] for m in milestones]
-    populations = [df[df['year'] == year]['population'].iloc[0] / 1_000_000 
-                  for year in years]
-    
-    # Color coding by event type
-    event_colors = {
-        "Economic Growth": "#228B22",
-        "Division": "#DC143C", 
-        "Crisis": "#FF8C00",
-        "Liberation": "#FFD700",
-        "Unity": "#32CD32",
-        "Peak": "#4169E1",
-        "Immigration": "#9370DB",
-        "Present": "#FF1493"
-    }
-    
-    colors = [event_colors[m[2]] for m in milestones]
-    
-    # Use demoviz for timeline points
-    dv.scatter(years, populations, sex=['M', 'F'] * 4, c=colors, 
-               s=80, zoom=1.0, jitter=0, ax=ax)
-    
-    # Connect with timeline
-    ax.plot(years, populations, '--', color='gray', alpha=0.6, linewidth=3, zorder=0)
-    
-    # Add milestone annotations
-    for i, (year, event, event_type) in enumerate(milestones):
-        pop = populations[i]
-        
-        # Alternate annotation positions
-        offset = 8 if i % 2 == 0 else -8
-        va = 'bottom' if i % 2 == 0 else 'top'
-        
-        ax.annotate(f'{year}\n{event}', 
-                   xy=(year, pop), xytext=(year, pop + offset),
-                   ha='center', va=va, fontsize=9, fontweight='bold',
-                   bbox=dict(boxstyle="round,pad=0.3", facecolor=colors[i], alpha=0.3),
-                   arrowprops=dict(arrowstyle='->', color=colors[i], alpha=0.7))
-    
-    # Customize plot
-    ax.set_xlabel('Year', fontsize=14)
-    ax.set_ylabel('Population (Millions)', fontsize=14)
-    ax.set_title('Germany\'s Demographic Milestones: A Human Story in Data', 
-                fontsize=16, fontweight='bold')
-    
-    # Add legend for event types
-    from matplotlib.patches import Patch
-    legend_elements = [Patch(facecolor=color, label=event_type) 
-                      for event_type, color in event_colors.items()]
-    ax.legend(handles=legend_elements, loc='center left', bbox_to_anchor=(1, 0.5),
-             title='Event Types', title_fontsize=12)
-    
-    ax.grid(True, alpha=0.3)
-    ax.set_xlim(1950, 2030)
-    
-    plt.tight_layout()
-    plt.savefig('plots/germany_demographic_timeline.png', dpi=300, bbox_inches='tight')
-    return fig
 
 def main():
     """Run the complete Germany demographic visualization showcase."""
@@ -436,8 +396,6 @@ def main():
         fig3 = create_population_pyramid_evolution(df)
         print("✅ Population pyramid evolution created")
         
-        fig4 = create_interactive_timeline(df)
-        print("✅ Interactive timeline created")
         
         print(f"\n🎉 All visualizations saved to 'data/' directory!")
         print("\nKey insights from the data:")
