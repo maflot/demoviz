@@ -1,0 +1,226 @@
+Examples and Tutorials
+======================
+
+This section provides comprehensive examples of how to use Demoviz for different types of demographic visualizations.
+
+Baby Growth Chart
+-----------------
+
+Create a simple baby growth chart using baby icons:
+
+.. code-block:: python
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from demoviz import DemoScatter
+
+   # Create sample baby health data
+   ages = [0, 6, 12, 18, 24]  # Age in months
+   weights = [3.5, 7.0, 9.5, 11.0, 12.5]  # Weight in kg
+
+   # Create the plot
+   fig, ax = plt.subplots(figsize=(8, 6))
+
+   # Initialize DemoScatter with baby icons
+   demo = DemoScatter(icon_size=40, zoom=0.4)
+
+   # Plot babies with baby icons
+   demo.plot(ax, ages, weights, icon_type='baby', colors='lightblue')
+
+   # Customize the plot
+   ax.set_xlabel('Age (months)')
+   ax.set_ylabel('Weight (kg)')
+   ax.set_title('Baby Growth Chart')
+   ax.grid(True, alpha=0.3)
+
+   plt.tight_layout()
+   plt.show()
+
+Multi-Category Visualization
+----------------------------
+
+Visualize different demographics using different icon types and colors:
+
+.. code-block:: python
+
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from demoviz import DemoScatter
+
+   # Create mixed demographic data
+   np.random.seed(42)
+   
+   # Adults (male/female)
+   adult_ages = np.random.uniform(25, 65, 15)
+   adult_heights = np.random.normal(170, 10, 15)
+   adult_genders = np.random.choice(['male', 'female'], 15)
+   
+   # Babies
+   baby_ages = np.random.uniform(0, 2, 8)
+   baby_heights = np.random.normal(75, 10, 8)
+   
+   # Combine data
+   all_ages = np.concatenate([adult_ages, baby_ages])
+   all_heights = np.concatenate([adult_heights, baby_heights])
+   all_icons = np.concatenate([adult_genders, ['baby'] * 8])
+   
+   # Create the plot
+   fig, ax = plt.subplots(figsize=(12, 8))
+   
+   demo = DemoScatter(icon_size=35, zoom=0.4)
+   
+   # Plot with different icons and colors
+   colors = ['red' if icon == 'female' else 'blue' if icon == 'male' else 'lightgreen' 
+             for icon in all_icons]
+   
+   demo.plot(ax, all_ages, all_heights, icon_type=all_icons, colors=colors)
+   
+   # Customize the plot
+   ax.set_xlabel('Age (years)')
+   ax.set_ylabel('Height (cm)')
+   ax.set_title('Multi-Demographics Height Distribution')
+   ax.grid(True, alpha=0.3)
+   
+   plt.tight_layout()
+   plt.show()
+
+Model Performance Visualization
+------------------------------
+
+Use baby icons to represent model performance in medical AI:
+
+.. code-block:: python
+
+   import pandas as pd
+   import matplotlib.pyplot as plt
+   from demoviz import DemoScatter
+   from matplotlib.colors import to_rgba
+
+   # Sample model performance data
+   models = ['Model A', 'Model B', 'Model C', 'Model D', 'Model E']
+   accuracy = [0.85, 0.78, 0.92, 0.88, 0.95]
+   auroc = [0.89, 0.81, 0.94, 0.91, 0.97]
+   model_types = ['RGB', 'XRV', 'RGB', 'XRV', 'XRV']
+   
+   # Create plot
+   fig, ax = plt.subplots(figsize=(10, 8))
+   
+   demo = DemoScatter(icon_size=60, zoom=0.5)
+   
+   # Color by model type
+   colors = []
+   for model_type in model_types:
+       if model_type == 'RGB':
+           colors.append(to_rgba('#4A90E2'))  # Blue
+       else:
+           colors.append(to_rgba('#E85D75'))  # Pink
+   
+   # Plot with baby icons
+   demo.plot(ax, accuracy, auroc, icon_type='baby', colors=colors)
+   
+   # Add labels for each model
+   for i, model in enumerate(models):
+       ax.annotate(model, (accuracy[i], auroc[i]), 
+                   xytext=(10, 10), textcoords='offset points',
+                   fontsize=10, weight='bold')
+   
+   ax.set_xlabel('Accuracy')
+   ax.set_ylabel('AUROC')
+   ax.set_title('Baby Health Prediction Models Performance')
+   ax.grid(True, alpha=0.3)
+   
+   plt.tight_layout()
+   plt.show()
+
+Customization Options
+--------------------
+
+Icon Size and Zoom
+~~~~~~~~~~~~~~~~~
+
+Control the appearance of icons:
+
+.. code-block:: python
+
+   # Small icons
+   demo_small = DemoScatter(icon_size=20, zoom=0.3)
+   
+   # Medium icons (default)
+   demo_medium = DemoScatter(icon_size=40, zoom=0.4)
+   
+   # Large icons
+   demo_large = DemoScatter(icon_size=80, zoom=0.6)
+
+Color Schemes
+~~~~~~~~~~~~
+
+Different ways to color your icons:
+
+.. code-block:: python
+
+   # Single color
+   demo.plot(ax, x, y, icon_type='baby', colors='lightblue')
+   
+   # Multiple colors
+   colors = ['red', 'blue', 'green', 'orange', 'purple']
+   demo.plot(ax, x, y, icon_type='baby', colors=colors)
+   
+   # RGB tuples
+   colors = [(0.2, 0.8, 0.2), (0.8, 0.2, 0.2), (0.2, 0.2, 0.8)]
+   demo.plot(ax, x, y, icon_type='baby', colors=colors)
+   
+   # Matplotlib color conversion
+   from matplotlib.colors import to_rgba
+   colors = [to_rgba('#4A90E2'), to_rgba('#E85D75')]
+   demo.plot(ax, x, y, icon_type='baby', colors=colors)
+
+Icon Types
+~~~~~~~~~
+
+Available icon types and their aliases:
+
+.. code-block:: python
+
+   # Baby icons
+   demo.plot(ax, x, y, icon_type='baby')
+   demo.plot(ax, x, y, icon_type='child')
+   demo.plot(ax, x, y, icon_type='infant')
+   
+   # Male icons
+   demo.plot(ax, x, y, icon_type='male')
+   demo.plot(ax, x, y, icon_type='person')
+   
+   # Female icons
+   demo.plot(ax, x, y, icon_type='female')
+   demo.plot(ax, x, y, icon_type='woman')
+
+Performance Tips
+---------------
+
+1. **Cache Management**: The library automatically caches rendered icons. Use ``demo.clear_cache()`` if you need to free memory.
+
+2. **Icon Sizes**: Larger icons (>100px) may impact performance. Consider using appropriate zoom levels instead.
+
+3. **Color Formats**: RGB tuples are processed faster than hex strings or named colors.
+
+4. **Batch Processing**: When creating multiple plots, reuse the same ``DemoScatter`` instance to benefit from caching.
+
+Troubleshooting
+--------------
+
+Common Issues
+~~~~~~~~~~~~
+
+**Icons appear too small**:
+   - Increase the ``zoom`` parameter
+   - Increase the ``icon_size`` parameter
+
+**Icons don't appear**:
+   - Check that the icon type is supported
+   - Verify that axis limits include your data points
+   - Ensure colors are in the correct format
+
+**Performance issues**:
+   - Use smaller icon sizes
+   - Clear the cache periodically with ``demo.clear_cache()``
+   - Consider using fewer data points for initial testing

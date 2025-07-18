@@ -1,0 +1,41 @@
+API Reference
+=============
+
+This section provides detailed documentation for all classes and functions in the Demoviz library.
+
+Core Module
+-----------
+
+.. automodule:: demoviz.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DemoScatter Class
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: demoviz.core.DemoScatter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Functions
+~~~~~~~~~
+
+.. autofunction:: demoviz.core.svg_to_colored_image
+
+Matplotlib Integration
+---------------------
+
+.. automodule:: demoviz.matplotlib_integration
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Seaborn Integration
+------------------
+
+.. automodule:: demoviz.seaborn_integration
+   :members:
+   :undoc-members:
+   :show-inheritance:

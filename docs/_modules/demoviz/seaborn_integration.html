@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>demoviz.seaborn_integration &mdash; Demoviz 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Demoviz
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Demoviz</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">demoviz.seaborn_integration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for demoviz.seaborn_integration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Seaborn-style integration for demoviz.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.matplotlib_integration</span><span class="w"> </span><span class="kn">import</span> <span class="n">scatter</span> <span class="k">as</span> <span class="n">base_scatter</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+    <span class="n">HAS_SEABORN</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">HAS_SEABORN</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="scatterplot"><a class="viewcode-back" href="../../api.html#demoviz.seaborn_integration.scatterplot">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+               <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sizes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">hue_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Seaborn-style scatter plot with human icons.</span>
+<span class="sd">    </span>
+<span class="sd">    This function mimics seaborn.scatterplot() but uses human icons instead of</span>
+<span class="sd">    regular markers.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : pandas.DataFrame, optional</span>
+<span class="sd">        Input data structure</span>
+<span class="sd">    x, y : str or array-like</span>
+<span class="sd">        Variables for x and y coordinates</span>
+<span class="sd">    sex : str or array-like, optional</span>
+<span class="sd">        Variable for icon type (male/female)</span>
+<span class="sd">    hue : str or array-like, optional</span>
+<span class="sd">        Variable for color mapping</span>
+<span class="sd">    size : str or array-like, optional  </span>
+<span class="sd">        Variable for size mapping</span>
+<span class="sd">    style : str or array-like, optional</span>
+<span class="sd">        Variable for icon style (currently same as sex)</span>
+<span class="sd">    palette : palette name, list, or dict, optional</span>
+<span class="sd">        Colors to use for hue levels</span>
+<span class="sd">    sizes : list, dict, or tuple, optional</span>
+<span class="sd">        Sizes to use for size levels</span>
+<span class="sd">    size_order : list, optional</span>
+<span class="sd">        Order for size levels</span>
+<span class="sd">    hue_order : list, optional</span>
+<span class="sd">        Order for hue levels</span>
+<span class="sd">    legend : &quot;auto&quot;, &quot;brief&quot;, &quot;full&quot;, or False</span>
+<span class="sd">        How to draw the legend</span>
+<span class="sd">    ax : matplotlib.axes.Axes, optional</span>
+<span class="sd">        Target axis</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        Additional arguments passed to base scatter function</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    matplotlib.axes.Axes</span>
+<span class="sd">        The plot axis</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Extract data if DataFrame provided</span>
+    <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span>
+        <span class="n">y_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">y</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">y</span>
+        <span class="n">sex_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">sex</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sex</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sex</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="n">sex</span>
+        <span class="n">hue_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">hue</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hue</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">hue</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="n">hue</span>
+        <span class="n">size_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="n">size</span>
+        
+        <span class="c1"># Handle empty data</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x_data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">y_data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sex_data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">hue_data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">size_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">sex_data</span><span class="p">,</span> <span class="n">hue_data</span><span class="p">,</span> <span class="n">size_data</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sex</span><span class="p">,</span> <span class="n">hue</span><span class="p">,</span> <span class="n">size</span>
+    
+    <span class="c1"># Create figure if needed</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+    
+    <span class="c1"># Handle color mapping</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">_process_hue_data</span><span class="p">(</span><span class="n">hue_data</span><span class="p">,</span> <span class="n">palette</span><span class="p">,</span> <span class="n">hue_order</span><span class="p">)</span>
+    
+    <span class="c1"># Handle size mapping  </span>
+    <span class="n">zoom</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;zoom&#39;</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">size_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">zoom</span> <span class="o">=</span> <span class="n">_process_size_data</span><span class="p">(</span><span class="n">size_data</span><span class="p">,</span> <span class="n">sizes</span><span class="p">,</span> <span class="n">size_order</span><span class="p">,</span> <span class="n">zoom</span><span class="p">)</span>
+    
+    <span class="c1"># Create the scatter plot</span>
+    <span class="n">base_scatter</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">sex</span><span class="o">=</span><span class="n">sex_data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="n">zoom</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    
+    <span class="c1"># Handle legend</span>
+    <span class="k">if</span> <span class="n">legend</span> <span class="ow">and</span> <span class="n">legend</span> <span class="o">!=</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">hue_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_create_legend</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">hue_data</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">hue_order</span><span class="p">,</span> <span class="n">hue</span><span class="p">)</span>
+    
+    <span class="c1"># Apply seaborn styling if available</span>
+    <span class="k">if</span> <span class="n">HAS_SEABORN</span><span class="p">:</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_process_hue_data</span><span class="p">(</span><span class="n">hue_data</span><span class="p">,</span> <span class="n">palette</span><span class="p">,</span> <span class="n">hue_order</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process hue data to create color mapping.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">hue_data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">hue_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    
+    <span class="c1"># Convert to list safely</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">hue_data</span><span class="p">,</span> <span class="s1">&#39;tolist&#39;</span><span class="p">):</span>
+        <span class="n">hue_list</span> <span class="o">=</span> <span class="n">hue_data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hue_data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">hue_list</span> <span class="o">=</span> <span class="n">hue_data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hue_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">hue_data</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">hue_list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    
+    <span class="c1"># Get unique values, handle mixed types</span>
+    <span class="n">unique_hues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">hue_list</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Sort safely with mixed types</span>
+        <span class="n">unique_hues</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">unique_hues</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+        <span class="k">pass</span>  <span class="c1"># Use unsorted if sorting fails</span>
+    
+    <span class="k">if</span> <span class="n">hue_order</span><span class="p">:</span>
+        <span class="n">unique_hues</span> <span class="o">=</span> <span class="n">hue_order</span>
+    
+    <span class="c1"># Create color mapping</span>
+    <span class="k">if</span> <span class="n">palette</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">HAS_SEABORN</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">palette</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pal</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="n">palette</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_hues</span><span class="p">))</span>
+                <span class="n">color_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">unique_hues</span><span class="p">,</span> <span class="n">pal</span><span class="p">))</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">color_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hue_list</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">palette</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">palette</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hue_list</span><span class="p">]</span>
+    
+    <span class="c1"># Default color mapping using matplotlib</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_hues</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colormaps</span><span class="p">[</span><span class="s1">&#39;tab10&#39;</span><span class="p">]</span>
+            <span class="n">color_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">hue</span><span class="p">:</span> <span class="n">cmap</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_hues</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> 
+                        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">hue</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_hues</span><span class="p">)}</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">color_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hue_list</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    
+    <span class="k">return</span> <span class="n">hue_list</span>  <span class="c1"># Return original data as fallback</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_process_size_data</span><span class="p">(</span><span class="n">size_data</span><span class="p">,</span> <span class="n">sizes</span><span class="p">,</span> <span class="n">size_order</span><span class="p">,</span> <span class="n">default_zoom</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process size data to create zoom mapping.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">size_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">default_zoom</span>
+    
+    <span class="c1"># Simple implementation - could be enhanced</span>
+    <span class="k">if</span> <span class="n">sizes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sizes</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span>  <span class="c1"># Convert to zoom range</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sizes</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="o">/</span> <span class="mi">100</span>
+    
+    <span class="k">return</span> <span class="n">default_zoom</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_legend</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">hue_data</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">hue_order</span><span class="p">,</span> <span class="n">hue_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create legend for hue mapping.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Get unique hues</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">hue_data</span><span class="p">,</span> <span class="s1">&#39;tolist&#39;</span><span class="p">):</span>
+            <span class="n">hue_list</span> <span class="o">=</span> <span class="n">hue_data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hue_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">hue_data</span><span class="p">)</span>
+        
+        <span class="n">unique_hues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">hue_list</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">unique_hues</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">unique_hues</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        
+        <span class="k">if</span> <span class="n">hue_order</span><span class="p">:</span>
+            <span class="n">unique_hues</span> <span class="o">=</span> <span class="n">hue_order</span>
+        
+        <span class="c1"># Create legend elements</span>
+        <span class="n">legend_elements</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">hue_val</span> <span class="ow">in</span> <span class="n">unique_hues</span><span class="p">:</span>
+            <span class="c1"># Find color for this hue</span>
+            <span class="k">if</span> <span class="n">colors</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="s1">&#39;__len__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">hue_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hue_list</span><span class="p">)</span> <span class="k">if</span> <span class="n">h</span> <span class="o">==</span> <span class="n">hue_val</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">hue_indices</span><span class="p">:</span>
+                    <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">hue_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                        <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;blue&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;blue&#39;</span>
+            
+            <span class="n">legend_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> 
+                          <span class="n">markerfacecolor</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">hue_val</span><span class="p">))</span>
+            <span class="p">)</span>
+        
+        <span class="n">title</span> <span class="o">=</span> <span class="n">hue_name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hue_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;Hue&#39;</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="n">legend_elements</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>  <span class="c1"># Fail silently if legend creation fails</span>
+
+
+<div class="viewcode-block" id="relplot"><a class="viewcode-back" href="../../api.html#demoviz.seaborn_integration.relplot">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">relplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;scatter&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Figure-level interface for drawing relational plots with human icons.</span>
+<span class="sd">    </span>
+<span class="sd">    This is a simplified version of seaborn.relplot() that supports human icons.</span>
+<span class="sd">    Currently only supports kind=&#39;scatter&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">kind</span> <span class="o">!=</span> <span class="s1">&#39;scatter&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only kind=&#39;scatter&#39; is currently supported&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Simple implementation - could be expanded for faceting</span>
+    <span class="k">if</span> <span class="n">col</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Single plot</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;figsize&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
+        <span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">sex</span><span class="o">=</span><span class="n">sex</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="n">hue</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Would need more complex faceting logic</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Faceting (col/row) not yet implemented&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="demographic_plot"><a class="viewcode-back" href="../../api.html#demoviz.seaborn_integration.demographic_plot">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">demographic_plot</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias for scatterplot. Deprecated - use scatterplot instead.&quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;demographic_plot is deprecated, use scatterplot instead&quot;</span><span class="p">,</span> 
+                  <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">scatterplot</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Demoviz Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>demoviz.matplotlib_integration &mdash; Demoviz 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Demoviz
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples and Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Demoviz</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">demoviz.matplotlib_integration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for demoviz.matplotlib_integration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Matplotlib integration for demoviz.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DemoScatter</span>
+
+
+<div class="viewcode-block" id="scatter"><a class="viewcode-back" href="../../api.html#demoviz.matplotlib_integration.scatter">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+           <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">custom_icons</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a scatter plot with human icons.</span>
+<span class="sd">    </span>
+<span class="sd">    This is the main high-level function for creating demographic scatter plots.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x, y : array-like</span>
+<span class="sd">        Data coordinates</span>
+<span class="sd">    sex : array-like, optional</span>
+<span class="sd">        Sex/gender for each point. Accepts &#39;M&#39;/&#39;F&#39;, &#39;male&#39;/&#39;female&#39;, 1/0, etc.</span>
+<span class="sd">        If None, uses generic person icons.</span>
+<span class="sd">    c : color or array-like, optional</span>
+<span class="sd">        Colors for icons. Can be single color, array of colors, or values to map.</span>
+<span class="sd">    s : float, default 40</span>
+<span class="sd">        Icon size in pixels</span>
+<span class="sd">    zoom : float, default 0.3</span>
+<span class="sd">        Icon zoom factor (affects visual size)</span>
+<span class="sd">    jitter : float, default 0</span>
+<span class="sd">        Random position jitter to avoid overlapping</span>
+<span class="sd">    ax : matplotlib.axes.Axes, optional</span>
+<span class="sd">        Target axis. Creates new figure if None.</span>
+<span class="sd">    figsize : tuple, optional</span>
+<span class="sd">        Figure size (width, height) if creating new figure</span>
+<span class="sd">    custom_icons : dict, optional</span>
+<span class="sd">        Custom icon paths {&#39;male&#39;: path, &#39;female&#39;: path}</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        Additional keyword arguments passed to axis setup</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    matplotlib.axes.Axes</span>
+<span class="sd">        The plot axis</span>
+<span class="sd">        </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Basic usage:</span>
+<span class="sd">    &gt;&gt;&gt; import demoviz as dv</span>
+<span class="sd">    &gt;&gt;&gt; ages = [45, 67, 23, 89, 34]</span>
+<span class="sd">    &gt;&gt;&gt; scores = [2, 5, 1, 6, 3] </span>
+<span class="sd">    &gt;&gt;&gt; sexes = [&#39;M&#39;, &#39;F&#39;, &#39;M&#39;, &#39;F&#39;, &#39;M&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; ax = dv.scatter(ages, scores, sex=sexes)</span>
+<span class="sd">    </span>
+<span class="sd">    With custom colors:</span>
+<span class="sd">    &gt;&gt;&gt; colors = [&#39;red&#39;, &#39;blue&#39;, &#39;green&#39;, &#39;purple&#39;, &#39;orange&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; ax = dv.scatter(ages, scores, sex=sexes, c=colors)</span>
+<span class="sd">    </span>
+<span class="sd">    With continuous color mapping:</span>
+<span class="sd">    &gt;&gt;&gt; severity = [0.2, 0.8, 0.1, 0.9, 0.4]</span>
+<span class="sd">    &gt;&gt;&gt; ax = dv.scatter(ages, scores, sex=sexes, c=severity)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Create figure/axis if needed</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    
+    <span class="c1"># Handle color mapping for continuous data</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="c1"># Check if it&#39;s numeric data that can be mapped to colors</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="s1">&#39;biufc&#39;</span><span class="p">:</span>  <span class="c1"># numeric data</span>
+            <span class="c1"># Map to colormap</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cmap&#39;</span><span class="p">,</span> <span class="s1">&#39;viridis&#39;</span><span class="p">)</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">vmax</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colormaps</span><span class="p">[</span><span class="n">cmap</span><span class="p">](</span><span class="n">norm</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>  <span class="c1"># Use modern API</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># For categorical data, create a color mapping</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">unique_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="o">~</span><span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">c</span><span class="p">)]</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">c</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_vals</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">:</span>  <span class="c1"># Reasonable number of categories</span>
+                    <span class="n">cmap</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cmap&#39;</span><span class="p">,</span> <span class="s1">&#39;tab10&#39;</span><span class="p">)</span>
+                    <span class="n">color_palette</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colormaps</span><span class="p">[</span><span class="n">cmap</span><span class="p">]</span>
+                    <span class="n">color_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">val</span><span class="p">:</span> <span class="n">color_palette</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_vals</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> 
+                               <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_vals</span><span class="p">)}</span>
+                    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">color_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">c</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">colors</span> <span class="o">=</span> <span class="n">c</span>  <span class="c1"># Let the core handle it</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">colors</span> <span class="o">=</span> <span class="n">c</span>  <span class="c1"># Let the core handle it</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Empty data</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">c</span>
+    
+    <span class="c1"># Create scatter plot</span>
+    <span class="n">demo_scatter</span> <span class="o">=</span> <span class="n">DemoScatter</span><span class="p">(</span><span class="n">icon_size</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="n">zoom</span><span class="p">,</span> <span class="n">custom_icons</span><span class="o">=</span><span class="n">custom_icons</span><span class="p">)</span>
+    <span class="n">demo_scatter</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">icon_type</span><span class="o">=</span><span class="n">sex</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="n">jitter</span><span class="p">)</span>
+    
+    <span class="c1"># Update data limits</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">update_datalim</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">autoscale</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="plot_demographics"><a class="viewcode-back" href="../../api.html#demoviz.matplotlib_integration.plot_demographics">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_demographics</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a demographic plot from a DataFrame.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : pandas.DataFrame</span>
+<span class="sd">        Input data</span>
+<span class="sd">    x, y : str</span>
+<span class="sd">        Column names for x and y coordinates</span>
+<span class="sd">    sex : str, optional</span>
+<span class="sd">        Column name for sex/gender</span>
+<span class="sd">    hue : str, optional  </span>
+<span class="sd">        Column name for color mapping</span>
+<span class="sd">    size : str, optional</span>
+<span class="sd">        Column name for size mapping (affects zoom)</span>
+<span class="sd">    figsize : tuple, default (10, 6)</span>
+<span class="sd">        Figure size</span>
+<span class="sd">    title : str, optional</span>
+<span class="sd">        Plot title</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        Additional arguments passed to scatter()</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    matplotlib.axes.Axes</span>
+<span class="sd">        The plot axis</span>
+<span class="sd">        </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">    &gt;&gt;&gt; import demoviz as dv</span>
+<span class="sd">    &gt;&gt;&gt; df = pd.DataFrame({</span>
+<span class="sd">    ...     &#39;age&#39;: [45, 67, 23, 89],</span>
+<span class="sd">    ...     &#39;score&#39;: [2, 5, 1, 6],</span>
+<span class="sd">    ...     &#39;sex&#39;: [&#39;M&#39;, &#39;F&#39;, &#39;M&#39;, &#39;F&#39;],</span>
+<span class="sd">    ...     &#39;severity&#39;: [0.2, 0.8, 0.1, 0.9]</span>
+<span class="sd">    ... })</span>
+<span class="sd">    &gt;&gt;&gt; ax = dv.plot_demographics(df, &#39;age&#39;, &#39;score&#39;, sex=&#39;sex&#39;, hue=&#39;severity&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Extract data</span>
+    <span class="n">x_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+    <span class="n">y_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">y</span><span class="p">]</span>
+    <span class="n">sex_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">sex</span><span class="p">]</span> <span class="k">if</span> <span class="n">sex</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">hue_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">hue</span><span class="p">]</span> <span class="k">if</span> <span class="n">hue</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">size_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="k">if</span> <span class="n">size</span> <span class="k">else</span> <span class="kc">None</span>
+    
+    <span class="c1"># Handle size mapping</span>
+    <span class="k">if</span> <span class="n">size_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Normalize size to reasonable zoom range</span>
+        <span class="n">size_norm</span> <span class="o">=</span> <span class="p">(</span><span class="n">size_data</span> <span class="o">-</span> <span class="n">size_data</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">size_data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">size_data</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+        <span class="n">zoom_values</span> <span class="o">=</span> <span class="mf">0.2</span> <span class="o">+</span> <span class="n">size_norm</span> <span class="o">*</span> <span class="mf">0.4</span>  <span class="c1"># Range from 0.2 to 0.6</span>
+        <span class="c1"># For now, we&#39;ll use average zoom (could be enhanced to support per-point sizing)</span>
+        <span class="n">zoom</span> <span class="o">=</span> <span class="n">zoom_values</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;zoom&#39;</span><span class="p">,</span> <span class="n">zoom</span><span class="p">)</span>
+    
+    <span class="c1"># Create plot</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">scatter</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">sex</span><span class="o">=</span><span class="n">sex_data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">hue_data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    
+    <span class="c1"># Styling</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">title</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">title</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">))</span>
+    
+    <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    
+    <span class="c1"># Add colorbar if using continuous hue</span>
+    <span class="k">if</span> <span class="n">hue_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">hue_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.cm</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cm</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cmap&#39;</span><span class="p">,</span> <span class="s1">&#39;viridis&#39;</span><span class="p">)</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">hue_data</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">vmax</span><span class="o">=</span><span class="n">hue_data</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+        <span class="n">sm</span><span class="o">.</span><span class="n">set_array</span><span class="p">([])</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">hue</span><span class="o">.</span><span class="n">title</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">))</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Demoviz Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
